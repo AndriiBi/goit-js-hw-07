@@ -2,41 +2,34 @@ import { galleryItems } from './gallery-items.js';
 
 const galleryList = document.querySelector(".gallery");
 
-// Функція для створення "li", "a", "img" у списку "gallery". 
-function createGalleryItem(item) {
-  const listItem = document.createElement("li");
-  listItem.classList.add("gallery__item");
+galleryList.insertAdjacentHTML('beforeend', createMarkup(galleryItems));
+galleryList.addEventListener('click', handleGalleryClick);
 
-  const link = document.createElement("a");
-  link.classList.add("gallery__link");
-  link.href = item.original;
+function handleGalleryClick(event) {
 
-  const image = document.createElement("img");
-  image.classList.add("gallery__image");
-  image.src = item.preview;
-  image.dataset.source = item.original;
-  image.alt = item.description;
+  if(event.target === event.currentTarget) {
+    return
+  }
 
-  link.appendChild(image);
-  listItem.appendChild(link);
-
- // EventListener для кожного "li" при кліку
- listItem.addEventListener('click', (event) => {
-    event.preventDefault();
-
- const lightbox = basicLightbox.create(`<img src="${item.original}" width="800" height="600">`);
-
-    lightbox.show();
-  });
-
-  return listItem;
+  event.preventDefault();
+  const item = event.target.closest('.gallery__item');
+  const img = item.querySelector('.gallery__image');
+  const lightbox = basicLightbox.create(`<img src="${img.dataset.source}" width="800" height="600">`);
+  lightbox.show();
+  
 }
 
-// Апенд зображень у список
-function appendGalleryItems(items) {
-  items.forEach(item => {
-    const galleryItem = createGalleryItem(item);
-    galleryList.appendChild(galleryItem);
-  });
+function createMarkup(items) {
+  return items.map(item => `
+    <li class="gallery__item">
+      <a class="gallery__link" href="${item.original}">
+        <img
+          class="gallery__image"
+          src="${item.preview}"
+          data-source="${item.original}"
+          alt="${item.description}"
+        />
+      </a>
+    </li>
+  `).join("");
 }
-appendGalleryItems(galleryItems);
